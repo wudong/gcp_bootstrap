@@ -16,7 +16,7 @@ resource "github_actions_secret" "build_sa" {
   plaintext_value = base64decode(google_service_account_key.github_action_secret.private_key)
 }
 
-resource "github_actions_secret" "build_sa" {
+resource "github_actions_secret" "project_id" {
   repository = github_repository.infra.name
   secret_name = "GCP_PROJECT_ID"
   plaintext_value = google_project.main.project_id
@@ -26,7 +26,7 @@ resource "github_repository_file" "tf_action_file" {
   repository          = github_repository.infra.name
   branch = "main"
   file = ".github/workflows/terraform.yml"
-  content = templatefile("${path.module}/files/terraform.yml", )
+  content = file("${path.module}/files/terraform.yml")
 }
 
 resource "github_repository_file" "tf_main_file" {

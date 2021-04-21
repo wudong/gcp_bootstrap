@@ -13,12 +13,12 @@ locals {
 }
 
 resource "google_project" "main" {
-  project_id = "gcp_${uid}"
-  name = "wudong-cloud-${uid}"
+  project_id = "gcp_${local.uid}"
+  name = "wudong-cloud-${local.uid}"
 }
 
 resource "google_service_account" "build_sa" {
-  account_id = "build_sa"
+  account_id = "buildsa"
   display_name = "Service Account for Github Action Pipeline"
 }
 
