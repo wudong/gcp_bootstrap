@@ -4,3 +4,6 @@ variable "github_token" {
 variable "github_owner" {
   type = string
 }
+variable "gcp_billing_acc" {
+    type = string
+}

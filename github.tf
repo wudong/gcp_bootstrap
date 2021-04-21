@@ -6,7 +6,17 @@ provider "github" {
 resource "github_repository" "infra" {
   name        = "infra"
   visibility = "public"
-  default_branch = "main"
+  auto_init = true
+}
+
+resource "github_branch" "dev" {
+  repository = github_repository.infra.name
+  branch = "dev"
+}
+
+resource "github_branch_default" "default" {
+  repository = github_repository.infra.name
+  branch = github_branch.dev.branch
 }
 
 resource "github_actions_secret" "build_sa" {
@@ -23,18 +33,21 @@ resource "github_actions_secret" "project_id" {
 }
 
 resource "github_repository_file" "tf_action_file" {
-  repository          = github_repository.infra.name
-  branch = "main"
-  file = ".github/workflows/terraform.yml"
+  repository  = github_repository.infra.name
+  branch      = github_branch.dev.branch
+  file        = ".github/workflows/terraform.yml"
+
   content = file("${path.module}/files/terraform.yml")
+
 }
 
 resource "github_repository_file" "tf_main_file" {
   repository          = github_repository.infra.name
-  branch = "main"
-  file = "./terraform.yml"
-
+  branch = github_branch.dev.branch
+  file           = "main.tf"
+  
   content = templatefile("${path.module}/files/main.tf", {
      bucket_name = google_storage_bucket.tf_state_bucket.name
   })
+
 }

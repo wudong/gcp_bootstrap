@@ -22,12 +22,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-  - name: Set up Cloud SDK
-    uses: google-github-actions/setup-gcloud@master
-    with:
-      project_id: ${{ secrets.GCP_PROJECT_ID }}
-      service_account_key: ${{ secrets.GCP_SA_KEY }}
-      export_default_credentials: true
+    # set up gcloud permissions so terraform can use it later.
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
 
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
@@ -45,8 +46,7 @@ jobs:
     - name: Terraform Plan
       run: terraform plan
 
-      # On push to main, build or change infrastructure according to Terraform configuration files
-      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+    # On push to dev, build or change infrastructure according to Terraform configuration files
     - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
       run: terraform apply -auto-approve
